@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.General;
 using TextEditor.Data;
 using TextEditor.Models;
 
@@ -25,11 +26,19 @@ namespace TextEditor.Controllers
         // GET: Docs
         public async Task<IActionResult> Index()
         {
+            var textEditorDB = from c in _context.Docs select c;
+            textEditorDB = textEditorDB.Where(a => a.UserId == User.FindFirstValue(ClaimTypes.NameIdentifier));
+            return View(await textEditorDB.Include(d => d.User).ToListAsync());
+        }
+
+        // GET: Docs
+        public async Task<IActionResult> Index()
+        {
             var textEditorDB = _context.Docs.Include(d => d.User);
             return View(await textEditorDB.ToListAsync());
         }
 
-       
+
 
         // GET: Docs/Create
         public IActionResult Create()
